@@ -1,5 +1,8 @@
 import serial
 import time
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Change this to the serial port you are using
 SERIAL_PORT = '/dev/ttyUSB0'
@@ -10,8 +13,8 @@ BAUD_RATE = 19200
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
 
 # Create a list to store each line of data
-###csv = []
-
+csv = []
+i=0
 # Read and print data from the serial port indefinitely
 while True:
     data = ser.readline().decode().rstrip()
@@ -27,7 +30,7 @@ while True:
     analog_input_3 = float(values[6])
     date = values[7]
     time_str = values[8]
-    ###csv.append[values]
+    csv.append(values)
     # Format the output string
     output_str = f"Ozone mixing ratio: {ozone_mixing_ratio:.2f} ppbv\n" \
                  f"Temperature: {temperature:.2f} K\n" \
@@ -41,7 +44,21 @@ while True:
 
     # Print the output string to the console
     print(output_str)
-
     # Wait for the next data transmission
     time.sleep(2)
+    i+=1
+    if i >= 25:
+        break
 
+df = pd.DataFrame(csv, columns=['ozone_mixing_ratio','temperature','pressure',
+                                'flow_rate','analog1','analog2','analog3','date',
+                                'time'])
+print(df)
+# df['time'] = pd.to_datetime(df['time'], format='%H:%M:%S')
+df.to_csv('/home/dusty/Desktop/2b_ozone/result.csv')
+df2 = pd.read_csv('/home/dusty/Desktop/2b_ozone/result.csv')
+#plt.ylim(0, 15)
+# plt.plot(df['time'],df['ozone_mixing_ratio'])
+df2.plot('time','ozone_mixing_ratio')
+plt.savefig('/home/dusty/Desktop/2b_ozone/result.png')
+plt.show()

@@ -3,6 +3,7 @@ import time
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import datetime
 
 # Change this to the serial port you are using
 SERIAL_PORT = '/dev/ttyUSB0'
@@ -45,20 +46,22 @@ while True:
     # Print the output string to the console
     print(output_str)
     # Wait for the next data transmission
-    time.sleep(2)
+    time.sleep(10)
     i+=1
-    if i >= 25:
+    if i >= 5:
         break
 
 df = pd.DataFrame(csv, columns=['ozone_mixing_ratio','temperature','pressure',
                                 'flow_rate','analog1','analog2','analog3','date',
                                 'time'])
 print(df)
-# df['time'] = pd.to_datetime(df['time'], format='%H:%M:%S')
-df.to_csv('/home/dusty/Desktop/2b_ozone/result.csv')
-df2 = pd.read_csv('/home/dusty/Desktop/2b_ozone/result.csv')
+date_now = datetime.now()
+df['time'] = pd.to_datetime(df['time'], format='%H:%M:%S')
+filename = f'{date_now}_{time_str}'
+df.to_csv(f'/home/dusty/Desktop/2b_ozone/{filename}.csv')
+df2 = pd.read_csv(f'/home/dusty/Desktop/2b_ozone/{filename}.csv')
 #plt.ylim(0, 15)
 # plt.plot(df['time'],df['ozone_mixing_ratio'])
 df2.plot('time','ozone_mixing_ratio')
-plt.savefig('/home/dusty/Desktop/2b_ozone/result.png')
+plt.savefig(f'/home/dusty/Desktop/2b_ozone/{filename}.png')
 plt.show()
